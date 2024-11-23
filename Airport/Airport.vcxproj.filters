@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{C196CD9C-2D76-4C38-368E-D70EA2ECB299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Airport">
+      <UniqueIdentifier>{512FB0BE-BDBA-1D83-C6CB-A07732D67983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Airport\src">
+      <UniqueIdentifier>{E82D05EF-548F-E2FC-DDFC-28AF495D19BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Airport\src\BasicForms">
+      <UniqueIdentifier>{00F716D0-EC1C-E136-D562-6602C1270603}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Airport\src\Menu">
+      <UniqueIdentifier>{0C94F432-F8B8-43B3-2104-29430D8842D1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{000BCD17-6C75-818E-B5B3-3234215D5FE3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Airport">
+      <UniqueIdentifier>{907283D6-FC88-816C-4500-0D8EB15552F4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Airport\src">
+      <UniqueIdentifier>{A7F83579-1365-F173-DC58-89D1488413DC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Airport\src\BasicForms">
+      <UniqueIdentifier>{5F2C8829-4B7D-736B-74E1-612D609106D5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Airport\src\Menu">
+      <UniqueIdentifier>{2BEEBC8A-17FE-685B-80B7-CD796CE657F4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{89565304-F535-D29F-FE4D-5D766AAC3801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Airport">
+      <UniqueIdentifier>{1937BDB4-85C2-2A79-8ED3-AD6DFADD8679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Airport\src">
+      <UniqueIdentifier>{B0D960B0-1C3B-3EBE-A5A8-84701109757D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Airport\src\BasicForms">
+      <UniqueIdentifier>{C8B512F0-B4DB-DC56-9D21-622289E60123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Airport\src\Menu">
+      <UniqueIdentifier>{D4DCDAB9-C001-2A3A-E94C-0FCAD5D02858}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\BasicForms\Airplanes.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\Airports.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\ArrivalBoard.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\Baggage.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\BoardingPass.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\DepartureBoard.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\Flights.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\Passangers.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LoginForm.h">
+      <Filter>Headers\Airport\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\MenuAgent.h">
+      <Filter>Headers\Airport\src\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BasicForms\Tickets.h" />
+    <ClInclude Include="src\AdditionalForms\MakeBaggage.h" />
+    <ClInclude Include="src\Menu\MenuTech.h" />
+    <ClInclude Include="src\Menu\MenuDisp.h" />
+    <ClInclude Include="src\AdditionalForms\MakeNewBaggage.h" />
+    <ClInclude Include="src\AdditionalForms\MakeNewPass.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\BasicForms\Airplanes.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\Airports.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\ArrivalBoard.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\Baggage.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\BoardingPass.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\DepartureBoard.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\Flights.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\Passangers.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoginForm.cpp">
+      <Filter>Sources\Airport\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\MenuAgent.cpp">
+      <Filter>Sources\Airport\src\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Sources\Airport\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BasicForms\Tickets.cpp" />
+    <ClCompile Include="src\AdditionalForms\MakePass.h" />
+    <ClCompile Include="src\AdditionalForms\MakePass.cpp" />
+    <ClCompile Include="src\AdditionalForms\MakeBaggage.cpp" />
+    <ClCompile Include="src\Menu\MenuTech.cpp" />
+    <ClCompile Include="src\Menu\MenuDisp.cpp" />
+    <ClCompile Include="src\AdditionalForms\MakeNewBaggage.cpp" />
+    <ClCompile Include="src\AdditionalForms\MakeNewPass.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\BasicForms\Flights.resx">
+      <Filter>Resources\Airport\src\BasicForms</Filter>
+    </None>
+    <None Include="src\Menu\MenuAgent.resx">
+      <Filter>Resources\Airport\src\Menu</Filter>
+    </None>
+  </ItemGroup>
+</Project>
