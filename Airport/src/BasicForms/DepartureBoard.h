@@ -20,10 +20,14 @@ namespace Airport
 	private:
 		void InitializeComponent(void);
 		void LoadFlights();
+		void LoadWebBrowser();
+		void dataGridViewDepBoard_CellFormatting(System::Object^ sender, System::Windows::Forms::DataGridViewCellFormattingEventArgs^ e);
+		void dataGridViewDepBoard_CellEndEdit(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
+		void UpdateFlightStatusInDatabase(String^ flightId, String^ newStatus);
 
 		MaterialSingleLineTextField^ txtFlight;
 		MaterialFlatButton^ btnSearch;
-
+		WebBrowser^ webBrowser;
 		DataGridView^ dataGridViewDepBoard;
 		SqlConnection^ sqlConnection;
 		System::ComponentModel::IContainer^ components;

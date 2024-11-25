@@ -1,0 +1,10 @@
+^C:\DEV\AIRPORT\AIRPORT\VENDOR\SOIL-MASTER\CMAKELISTS.TXT
+setlocal
+C:\Programs\CMake\bin\cmake.exe -SC:/dev/Airport/Airport/vendor/SOIL-master -BC:/dev/Airport/Airport/vendor/SOIL-master --check-stamp-file C:/dev/Airport/Airport/vendor/SOIL-master/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

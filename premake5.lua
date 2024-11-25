@@ -21,16 +21,28 @@ project "Airport"
     includedirs {
         "%{prj.name}/src",
         "%{prj.name}/vendor",
+        "%{prj.name}/vendor/assimp/include",
         "%{prj.name}/packages/MaterialSkin.0.2.1",
-        "Properties/**.resx"  
+        "Properties/**.resx",
+    }
+
+    libdirs {
+        "%{prj.name}/vendor/assimp/lib/Debug",
+        "%{prj.name}/vendor/GL/lib/Debug",
+        "%{prj.name}/vendor/SOIL-master/Debug",
+        "C:/dev/Airport/packages/Microsoft.Web.WebView2.1.0.2903.40/build/native/arm64"
     }
 
     links {  
+        "%{prj.name}/vendor/assimp/bin/Debug/assimp-vc143-mtd.dll",
         "System.dll",   
         "System.Data.dll",
         "System.Windows.Forms.dll", 
         "System.Drawing.dll",
-        "C:/dev/Airport/packages/MaterialSkin.0.2.1/lib/MaterialSkin.dll"
+        "C:/dev/Airport/packages/MaterialSkin.0.2.1/lib/MaterialSkin.dll",
+        "assimp-vc143-mtd.lib",
+        "soil.lib",
+        "WebView2Loader.dll.lib"
     }     
     
     flags {

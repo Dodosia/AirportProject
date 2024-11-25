@@ -1,0 +1,3 @@
+C:/dev/Airport/Airport/vendor/SOIL-master/CMakeFiles/soil.dir
+C:/dev/Airport/Airport/vendor/SOIL-master/CMakeFiles/ALL_BUILD.dir
+C:/dev/Airport/Airport/vendor/SOIL-master/CMakeFiles/ZERO_CHECK.dir

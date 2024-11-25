@@ -1,0 +1,9 @@
+﻿  SOIL.c
+  image_DXT.c
+  image_helper.c
+C:\dev\Airport\Airport\vendor\SOIL-master\src\SOIL.c(33,10): error C1083: Не удается открыть файл включение: SOIL/SOIL.h: No such file or directory,
+C:\dev\Airport\Airport\vendor\SOIL-master\src\image_DXT.c(10,10): error C1083: Не удается открыть файл включение: SOIL/image_DXT.h: No such file or directory,
+C:\dev\Airport\Airport\vendor\SOIL-master\src\image_helper.c(9,10): error C1083: Не удается открыть файл включение: SOIL/image_helper.h: No such file or directory,
+  stb_image_aug.c
+C:\dev\Airport\Airport\vendor\SOIL-master\src\stb_image_aug.c(15,10): error C1083: Не удается открыть файл включение: SOIL/stb_image_aug.h: No such file or directory,
+  Создание кода...

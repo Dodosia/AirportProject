@@ -52,6 +52,7 @@ namespace Airport
 		this->dataGridViewAirplanes->Columns->Add("¬местимость", "¬местимость");
 		this->dataGridViewAirplanes->Columns->Add("¬есЅагажа", "¬ес багажа");
 		this->dataGridViewAirplanes->Columns->Add("√од¬вода¬Ёксплуатацию", "√од ввода в эксплуатацию");
+		this->dataGridViewAirplanes->CellDoubleClick += gcnew DataGridViewCellEventHandler(this, &AirplanesForm::dataGridViewAirplanes_CellDoubleClick);
 
 		this->Controls->Add(this->dataGridViewAirplanes);
 
@@ -100,4 +101,23 @@ namespace Airport
 		reader->Close();
 		sqlConnection->Close();
     }
+
+	void AirplanesForm::dataGridViewAirplanes_CellDoubleClick(Object^ sender, DataGridViewCellEventArgs^ e)
+	{
+		if (e->RowIndex >= 0)
+		{
+			DataGridViewRow^ row = this->dataGridViewAirplanes->Rows[e->RowIndex];
+
+			// »звлеките данные самолета из выбранной строки
+			String^ airplaneId = row->Cells["Id"]->Value->ToString();
+			String^ model = row->Cells["ћодель"]->Value->ToString();
+			String^ capacity = row->Cells["¬местимость"]->Value->ToString();
+			String^ baggageWeight = row->Cells["¬есЅагажа"]->Value->ToString();
+			String^ year = row->Cells["√од¬вода¬Ёксплуатацию"]->Value->ToString();
+
+			// ќткройте новую форму и передайте данные
+			AirplaneForm^ airplaneForm = gcnew AirplaneForm(airplaneId, model, capacity, baggageWeight, year);
+			airplaneForm->ShowDialog();
+		}
+	}
 }

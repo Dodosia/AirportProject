@@ -38,19 +38,28 @@ namespace Airport
 		this->dataGridViewArBoard->RowHeadersDefaultCellStyle->SelectionBackColor = System::Drawing::Color::LightBlue;
 		this->dataGridViewArBoard->DefaultCellStyle->SelectionBackColor = System::Drawing::Color::LightBlue;
 		this->dataGridViewArBoard->DefaultCellStyle->SelectionForeColor = System::Drawing::Color::Black;
-		this->dataGridViewArBoard->Dock = System::Windows::Forms::DockStyle::Fill;
 		this->dataGridViewArBoard->Margin = System::Windows::Forms::Padding(10);
 		this->dataGridViewArBoard->Font = gcnew System::Drawing::Font("Arial", 14, System::Drawing::FontStyle::Regular);
 		this->dataGridViewArBoard->BackgroundColor = System::Drawing::Color::White;
 		this->dataGridViewArBoard->ForeColor = System::Drawing::Color::Black;
 		this->dataGridViewArBoard->AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode::Fill;
-		this->dataGridViewArBoard->Location = System::Drawing::Point(20, 80);
-		this->dataGridViewArBoard->Size = System::Drawing::Size(this->ClientSize.Width - this->dataGridViewArBoard->Location.X - rightMargin, this->ClientSize.Height - this->dataGridViewArBoard->Location.Y - bottomMargin);
-		this->dataGridViewArBoard->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Bottom | AnchorStyles::Left | AnchorStyles::Right);
+		this->dataGridViewArBoard->Size = System::Drawing::Size(this->ClientSize.Width - 2 * rightMargin, 300);
+		this->dataGridViewArBoard->Location = System::Drawing::Point(rightMargin, 80);
+		this->dataGridViewArBoard->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
+		this->dataGridViewArBoard->RowTemplate->Height = 40;
+
 		this->dataGridViewArBoard->Columns->Add("Id", "Id");
 		this->dataGridViewArBoard->Columns->Add("НомерРейса", "Номер рейса");
 		this->dataGridViewArBoard->Columns->Add("Время", "Время прибытия");
-		this->dataGridViewArBoard->Columns->Add("Статус", "Статус");
+
+		DataGridViewComboBoxColumn^ comboBoxColumn = gcnew DataGridViewComboBoxColumn();
+		comboBoxColumn->Name = "Статус";
+		comboBoxColumn->HeaderText = "Статус";
+		comboBoxColumn->DataSource = gcnew array<String^> { "Отменен", "Задержан", "Прибыл", "Посадка" };
+		this->dataGridViewArBoard->Columns->Add(comboBoxColumn);
+
+		this->dataGridViewArBoard->CellEndEdit += gcnew DataGridViewCellEventHandler(this, &ArrivalBoardForm::dataGridViewDepBoard_CellEndEdit);
+
 		for each (DataGridViewColumn ^ column in this->dataGridViewArBoard->Columns)
 		{
 			column->ReadOnly = true;
@@ -70,6 +79,8 @@ namespace Airport
 		this->btnSearch->Text = "Найти";
 		this->btnSearch->Location = System::Drawing::Point(370, 15);
 		this->Controls->Add(this->btnSearch);
+
+		LoadWebBrowser();
 	}
 
 	void ArrivalBoardForm::LoadFlights()
@@ -95,5 +106,53 @@ namespace Airport
 
 		reader->Close();
 		sqlConnection->Close();
+	}
+
+	void ArrivalBoardForm::LoadWebBrowser()
+	{
+		this->webBrowser = gcnew System::Windows::Forms::WebBrowser();
+		this->webBrowser->ScriptErrorsSuppressed = true;
+		this->webBrowser->Location = System::Drawing::Point(20, this->dataGridViewArBoard->Bottom + 20);
+		this->webBrowser->Size = System::Drawing::Size(this->ClientSize.Width - 2 * 20,  500);
+		this->webBrowser->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right );
+		this->Controls->Add(this->webBrowser);
+		String^ mapHtml = "file:///C:/dev/Airport/Airport/vendor/map/map.html";
+		this->webBrowser->Navigate(mapHtml);
+	}
+
+	void ArrivalBoardForm::dataGridViewDepBoard_CellEndEdit(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e)
+	{
+		if (this->dataGridViewArBoard->Columns[e->ColumnIndex]->Name == "Статус")
+		{
+			String^ newStatus = safe_cast<String^>(this->dataGridViewArBoard->Rows[e->RowIndex]->Cells["Статус"]->Value);
+			String^ flightId = safe_cast<String^>(this->dataGridViewArBoard->Rows[e->RowIndex]->Cells["Id"]->Value);
+
+			UpdateFlightStatusInDatabase(flightId, newStatus);
+		}
+	}
+
+	void ArrivalBoardForm::UpdateFlightStatusInDatabase(String^ flightId, String^ newStatus)
+	{
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		SqlConnection^ sqlConnection = gcnew SqlConnection(connectionString);
+
+		try
+		{
+			sqlConnection->Open();
+			String^ query = "UPDATE ТаблоПрилета SET Статус = @newStatus WHERE Id = @flightId";
+			SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+			command->Parameters->AddWithValue("@newStatus", newStatus);
+			command->Parameters->AddWithValue("@flightId", flightId);
+
+			command->ExecuteNonQuery();
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show("Ошибка обновления статуса: " + ex->Message);
+		}
+		finally
+		{
+			sqlConnection->Close();
+		}
 	}
 }

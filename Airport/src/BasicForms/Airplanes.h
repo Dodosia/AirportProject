@@ -10,6 +10,8 @@ using namespace System::Data::SqlClient;
 using namespace MaterialSkin;
 using namespace MaterialSkin::Controls;
 
+#include "AdditionalForms/Airplane.h"
+
 namespace Airport 
 {
 	public ref class AirplanesForm : public System::Windows::Forms::Form
@@ -20,6 +22,7 @@ namespace Airport
 	private:
 		void InitializeComponent(void);
 		void LoadAirplanes();
+		void dataGridViewAirplanes_CellDoubleClick(Object^ sender, DataGridViewCellEventArgs^ e);
 
 		MaterialSingleLineTextField^ txtModel;
 		MaterialSingleLineTextField^ txtYear;

@@ -10,6 +10,9 @@
     <Filter Include="Headers\Airport\src">
       <UniqueIdentifier>{E82D05EF-548F-E2FC-DDFC-28AF495D19BC}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Airport\src\AdditionalForms">
+      <UniqueIdentifier>{3724A6F0-A3DD-109B-2C3D-2B7598F5C60A}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Headers\Airport\src\BasicForms">
       <UniqueIdentifier>{00F716D0-EC1C-E136-D562-6602C1270603}</UniqueIdentifier>
     </Filter>
@@ -40,6 +43,9 @@
     <Filter Include="Sources\Airport\src">
       <UniqueIdentifier>{B0D960B0-1C3B-3EBE-A5A8-84701109757D}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Airport\src\AdditionalForms">
+      <UniqueIdentifier>{FF5F304C-6B19-9BF6-F478-B5D060315166}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Sources\Airport\src\BasicForms">
       <UniqueIdentifier>{C8B512F0-B4DB-DC56-9D21-622289E60123}</UniqueIdentifier>
     </Filter>
@@ -48,6 +54,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AdditionalForms\Airplane.h">
+      <Filter>Headers\Airport\src\AdditionalForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdditionalForms\MakeBaggage.h">
+      <Filter>Headers\Airport\src\AdditionalForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdditionalForms\MakeNewBaggage.h">
+      <Filter>Headers\Airport\src\AdditionalForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdditionalForms\MakeNewPass.h">
+      <Filter>Headers\Airport\src\AdditionalForms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AdditionalForms\MakePass.h">
+      <Filter>Headers\Airport\src\AdditionalForms</Filter>
+    </ClInclude>
     <ClInclude Include="src\BasicForms\Airplanes.h">
       <Filter>Headers\Airport\src\BasicForms</Filter>
     </ClInclude>
@@ -72,20 +93,38 @@
     <ClInclude Include="src\BasicForms\Passangers.h">
       <Filter>Headers\Airport\src\BasicForms</Filter>
     </ClInclude>
+    <ClInclude Include="src\BasicForms\Tickets.h">
+      <Filter>Headers\Airport\src\BasicForms</Filter>
+    </ClInclude>
     <ClInclude Include="src\LoginForm.h">
       <Filter>Headers\Airport\src</Filter>
     </ClInclude>
     <ClInclude Include="src\Menu\MenuAgent.h">
       <Filter>Headers\Airport\src\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="src\BasicForms\Tickets.h" />
-    <ClInclude Include="src\AdditionalForms\MakeBaggage.h" />
-    <ClInclude Include="src\Menu\MenuTech.h" />
-    <ClInclude Include="src\Menu\MenuDisp.h" />
-    <ClInclude Include="src\AdditionalForms\MakeNewBaggage.h" />
-    <ClInclude Include="src\AdditionalForms\MakeNewPass.h" />
+    <ClInclude Include="src\Menu\MenuDisp.h">
+      <Filter>Headers\Airport\src\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Menu\MenuTech.h">
+      <Filter>Headers\Airport\src\Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AdditionalForms\Airplane.cpp">
+      <Filter>Sources\Airport\src\AdditionalForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdditionalForms\MakeBaggage.cpp">
+      <Filter>Sources\Airport\src\AdditionalForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdditionalForms\MakeNewBaggage.cpp">
+      <Filter>Sources\Airport\src\AdditionalForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdditionalForms\MakeNewPass.cpp">
+      <Filter>Sources\Airport\src\AdditionalForms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AdditionalForms\MakePass.cpp">
+      <Filter>Sources\Airport\src\AdditionalForms</Filter>
+    </ClCompile>
     <ClCompile Include="src\BasicForms\Airplanes.cpp">
       <Filter>Sources\Airport\src\BasicForms</Filter>
     </ClCompile>
@@ -110,23 +149,24 @@
     <ClCompile Include="src\BasicForms\Passangers.cpp">
       <Filter>Sources\Airport\src\BasicForms</Filter>
     </ClCompile>
+    <ClCompile Include="src\BasicForms\Tickets.cpp">
+      <Filter>Sources\Airport\src\BasicForms</Filter>
+    </ClCompile>
     <ClCompile Include="src\LoginForm.cpp">
       <Filter>Sources\Airport\src</Filter>
     </ClCompile>
     <ClCompile Include="src\Menu\MenuAgent.cpp">
       <Filter>Sources\Airport\src\Menu</Filter>
     </ClCompile>
+    <ClCompile Include="src\Menu\MenuDisp.cpp">
+      <Filter>Sources\Airport\src\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu\MenuTech.cpp">
+      <Filter>Sources\Airport\src\Menu</Filter>
+    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Sources\Airport\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\BasicForms\Tickets.cpp" />
-    <ClCompile Include="src\AdditionalForms\MakePass.h" />
-    <ClCompile Include="src\AdditionalForms\MakePass.cpp" />
-    <ClCompile Include="src\AdditionalForms\MakeBaggage.cpp" />
-    <ClCompile Include="src\Menu\MenuTech.cpp" />
-    <ClCompile Include="src\Menu\MenuDisp.cpp" />
-    <ClCompile Include="src\AdditionalForms\MakeNewBaggage.cpp" />
-    <ClCompile Include="src\AdditionalForms\MakeNewPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\BasicForms\Flights.resx">
@@ -135,5 +175,6 @@
     <None Include="src\Menu\MenuAgent.resx">
       <Filter>Resources\Airport\src\Menu</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

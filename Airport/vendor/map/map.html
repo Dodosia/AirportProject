@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Анимация самолетов</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    var map = L.map('map').setView([51.505, -0.09], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var airportCoordinates = {
+      "SVO": [55.4064, 37.9016],
+      "JFK": [40.6413, -73.7781],
+      "LAX": [33.9416, -118.4085], 
+      "CDG": [49.0097, 2.5479], 
+      "FRA": [50.1109, 8.6821],
+      "NRT": [35.7819, 140.3929], 
+      "HND": [35.5523, 139.7798], 
+      "LHR": [51.4700, -0.4543], 
+      "DXB": [25.276987, 55.396832], 
+      "SYD": [-33.8688, 151.2093],
+      "SIN": [1.3644, 103.9915],
+      "AMS": [52.3779, 4.8974],
+    };
+
+    var flightData = [
+      { id: 'SVO001', departure: 'SVO', destination: 'LED', time: '00:00:00' },
+      { id: 'SVO002', departure: 'SVO', destination: 'JFK', time: '00:30:00' },
+      { id: 'SVO003', departure: 'SVO', destination: 'LAX', time: '01:00:00' },
+      { id: 'SVO004', departure: 'SVO', destination: 'CDG', time: '01:30:00' },
+      { id: 'SVO005', departure: 'SVO', destination: 'FRA', time: '02:00:00' },
+      { id: 'SVO006', departure: 'SVO', destination: 'NRT', time: '02:30:00' },
+      { id: 'SVO007', departure: 'SVO', destination: 'HND', time: '03:00:00' },
+      { id: 'SVO008', departure: 'SVO', destination: 'LHR', time: '03:30:00' },
+      { id: 'SVO009', departure: 'SVO', destination: 'DXB', time: '04:00:00' },
+      { id: 'SVO010', departure: 'SVO', destination: 'HKG', time: '04:30:00' },
+      { id: 'SVO011', departure: 'SVO', destination: 'SYD', time: '05:00:00' },
+      { id: 'SVO012', departure: 'SVO', destination: 'SIN', time: '05:30:00' },
+      { id: 'SVO013', departure: 'SVO', destination: 'AMS', time: '06:00:00' },
+      { id: 'SVO014', departure: 'SVO', destination: 'DXB', time: '06:30:00' },
+      { id: 'SVO015', departure: 'SVO', destination: 'FRA', time: '07:00:00' },
+      { id: 'SVO016', departure: 'SVO', destination: 'JFK', time: '07:30:00' },
+      { id: 'SVO017', departure: 'SVO', destination: 'LAX', time: '08:00:00' },
+      { id: 'SVO018', departure: 'SVO', destination: 'CDG', time: '08:30:00' },
+      { id: 'SVO019', departure: 'SVO', destination: 'HND', time: '09:00:00' },
+      { id: 'SVO020', departure: 'SVO', destination: 'LED', time: '09:30:00' },
+      { id: 'SVO021', departure: 'SVO', destination: 'SYD', time: '10:00:00' },
+      { id: 'SVO022', departure: 'SVO', destination: 'SIN', time: '10:30:00' },
+      { id: 'SVO023', departure: 'SVO', destination: 'HKG', time: '11:00:00' },
+      { id: 'SVO024', departure: 'SVO', destination: 'LHR', time: '11:30:00' },
+      { id: 'SVO025', departure: 'SVO', destination: 'DXB', time: '12:00:00' },
+      { id: 'SVO026', departure: 'SVO', destination: 'JFK', time: '12:30:00' },
+      { id: 'SVO027', departure: 'SVO', destination: 'LAX', time: '13:00:00' },
+      { id: 'SVO028', departure: 'SVO', destination: 'CDG', time: '13:30:00' },
+      { id: 'SVO029', departure: 'SVO', destination: 'HND', time: '14:00:00' },
+      { id: 'SVO030', departure: 'SVO', destination: 'LED', time: '14:30:00' },
+      { id: 'SVO031', departure: 'SVO', destination: 'SYD', time: '15:00:00' },
+      { id: 'SVO032', departure: 'SVO', destination: 'SIN', time: '15:30:00' },
+      { id: 'SVO033', departure: 'SVO', destination: 'HKG', time: '16:00:00' },
+      { id: 'SVO034', departure: 'SVO', destination: 'LHR', time: '16:30:00' },
+      { id: 'SVO035', departure: 'SVO', destination: 'DXB', time: '17:00:00' },
+      { id: 'SVO036', departure: 'SVO', destination: 'JFK', time: '17:30:00' },
+      { id: 'SVO037', departure: 'SVO', destination: 'LAX', time: '18:00:00' },
+      { id: 'SVO038', departure: 'SVO', destination: 'CDG', time: '18:30:00' },
+      { id: 'SVO039', departure: 'SVO', destination: 'HND', time: '19:00:00' },
+      { id: 'SVO040', departure: 'SVO', destination: 'LED', time: '19:30:00' },
+      { id: 'SVO041', departure: 'SVO', destination: 'SYD', time: '20:00:00' },
+      { id: 'SVO042', departure: 'SVO', destination: 'SIN', time: '20:30:00' },
+      { id: 'SVO043', departure: 'SVO', destination: 'HKG', time: '21:00:00' },
+      { id: 'SVO044', departure: 'SVO', destination: 'LHR', time: '21:30:00' },
+      { id: 'SVO045', departure: 'SVO', destination: 'DXB', time: '22:00:00' }
+    ];
+
+    var planeIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/0/614.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    function timeToSeconds(time) {
+      var parts = time.split(':');
+      return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+    }
+
+    function getCurrentTimeInSeconds() {
+      var now = new Date();
+      return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    }
+
+    var markers = [];
+
+    flightData.forEach(function(flight) {
+      var departureCoords = airportCoordinates[flight.departure];
+      var destinationCoords = airportCoordinates[flight.destination];
+      var marker = L.marker(departureCoords, { icon: planeIcon }).addTo(map);
+
+      var popupContent = "<b>Рейс: </b>" + flight.id + "<br>" + 
+                   "<b>Аэропорт вылета: </b>" + flight.departure.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;') + "<br>" + 
+                   "<b>Аэропорт прибытия: </b>" + flight.destination.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;');
+      marker.bindPopup(popupContent);
+
+      markers.push({ marker: marker, flight: flight }); 
+
+      function updateMarkerPosition() {
+        var currentTimeInSeconds = getCurrentTimeInSeconds();
+        var flightTimeInSeconds = timeToSeconds(flight.time);
+        var timeElapsed = currentTimeInSeconds - flightTimeInSeconds;
+        if (timeElapsed > 0) {
+          var travelTime = 3600; 
+          var progress = timeElapsed / travelTime; 
+
+          var newLat = departureCoords[0] + (destinationCoords[0] - departureCoords[0]) * progress;
+          var newLon = departureCoords[1] + (destinationCoords[1] - departureCoords[1]) * progress;
+          
+          markers.forEach(function(item) {
+            if (item.flight.id === flight.id) {
+              item.marker.setLatLng([newLat, newLon]);
+            }
+          });
+
+          if (progress >= 1) {
+            markers.forEach(function(item) {
+              if (item.flight.id === flight.id) {
+                item.marker.setLatLng(destinationCoords);
+              }
+            });
+          }
+        }
+      }
+      setInterval(updateMarkerPosition, 1000);
+    });
+  </script>
+</body>
+</html>
