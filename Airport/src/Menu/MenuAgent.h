@@ -22,18 +22,19 @@ namespace Airport
 	public:
 		MenuAgentForm(void);
 		~MenuAgentForm();
+		TabPage^ boardingPassTab;
+		TabPage^ baggageTab;
 	protected:
-		//virtual void OnPaint(PaintEventArgs^ e) override;
+
 	private:
 		void InitializeComponent(void);
+		void tabControl_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e);
 
 		MaterialTabControl^ tabControl;
 		MaterialTabSelector^ tabSelector;
 		TabPage^ flightsTab;
 		TabPage^ passangersTab;
-		TabPage^ boardingPassTab;
 		TabPage^ ticketsTab;
-		TabPage^ baggageTab;
 
 		System::ComponentModel::IContainer^ components;
 		System::Windows::Forms::Button^ flightsButton;

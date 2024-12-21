@@ -6,6 +6,11 @@ namespace Airport
     {
         InitializeComponent();
         LoadAirplanes();
+
+		updateTimer = gcnew System::Windows::Forms::Timer();
+		updateTimer->Interval = 60000;
+		updateTimer->Tick += gcnew EventHandler(this, &AirplanesForm::UpdateTablo);
+		updateTimer->Start();
     }
 
     AirplanesForm::~AirplanesForm()
@@ -52,19 +57,21 @@ namespace Airport
 		this->dataGridViewAirplanes->Columns->Add("Вместимость", "Вместимость");
 		this->dataGridViewAirplanes->Columns->Add("ВесБагажа", "Вес багажа");
 		this->dataGridViewAirplanes->Columns->Add("ГодВводаВЭксплуатацию", "Год ввода в эксплуатацию");
+		this->dataGridViewAirplanes->Columns->Add("Статус", "Статус");
+		this->dataGridViewAirplanes->Columns->Add("ДатаПоследнегоОбслуживания", "Дата последнего обслуживания");
 		this->dataGridViewAirplanes->CellDoubleClick += gcnew DataGridViewCellEventHandler(this, &AirplanesForm::dataGridViewAirplanes_CellDoubleClick);
 
 		this->Controls->Add(this->dataGridViewAirplanes);
 
 		this->txtModel = gcnew MaterialSingleLineTextField();
-		this->txtModel->Hint = "Модель самолета";
+		this->txtModel->Hint = "Id самолета";
 		this->txtModel->ForeColor = System::Drawing::Color::Black;
 		this->txtModel->Location = System::Drawing::Point(20, 20);
 		this->txtModel->Size = System::Drawing::Size(300, 20);
 		this->Controls->Add(this->txtModel);
 
 		this->txtYear = gcnew MaterialSingleLineTextField();
-		this->txtYear->Hint = "Год ввода в эксплуатацию";
+		this->txtYear->Hint = "Статус";
 		this->txtYear->ForeColor = System::Drawing::Color::Black;
 		this->txtYear->Location = System::Drawing::Point(370, 20);
 		this->txtYear->Size = System::Drawing::Size(300, 20);
@@ -73,7 +80,14 @@ namespace Airport
 		this->btnSearch = gcnew MaterialFlatButton();
 		this->btnSearch->Text = "Найти";
 		this->btnSearch->Location = System::Drawing::Point(720, 15);
+		this->btnSearch->Click += gcnew System::EventHandler(this, &AirplanesForm::btnSearch_Click);
 		this->Controls->Add(this->btnSearch);
+
+		this->btnClear = gcnew MaterialFlatButton();
+		this->btnClear->Text = "Очистить";
+		this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+		this->btnClear->Click += gcnew System::EventHandler(this, &AirplanesForm::btnClear_Click);
+		this->Controls->Add(this->btnClear);
     }
 
     void AirplanesForm::LoadAirplanes()
@@ -89,13 +103,31 @@ namespace Airport
 
 		while (reader->Read())
 		{
-			dataGridViewAirplanes->Rows->Add(
+			int index = dataGridViewAirplanes->Rows->Add(
 				reader["Id"]->ToString(),
 				reader["Модель"]->ToString(),
 				reader["Вместимость"]->ToString(),
 				reader["ВесБагажа"]->ToString(),
-				reader["ГодВводаВЭксплуатацию"]->ToString()
+				reader["ГодВводаВЭксплуатацию"]->ToString(),
+				reader["Статус"]->ToString(),
+				reader["ДатаПоследнегоОбслуживания"]->ToString()
 			);
+
+			DataGridViewRow^ row = dataGridViewAirplanes->Rows[index];
+			String^ status = row->Cells["Статус"]->Value->ToString();
+
+			if (status == "Готов к полёту")
+			{
+				row->DefaultCellStyle->ForeColor = System::Drawing::Color::Green;
+			}
+			else if (status == "Требуется осмотр")
+			{
+				row->DefaultCellStyle->ForeColor = System::Drawing::Color::Goldenrod;
+			}
+			else if (status == "На ремонте")
+			{
+				row->DefaultCellStyle->ForeColor = System::Drawing::Color::Red;
+			}
 		}
 
 		reader->Close();
@@ -108,16 +140,108 @@ namespace Airport
 		{
 			DataGridViewRow^ row = this->dataGridViewAirplanes->Rows[e->RowIndex];
 
-			// Извлеките данные самолета из выбранной строки
 			String^ airplaneId = row->Cells["Id"]->Value->ToString();
 			String^ model = row->Cells["Модель"]->Value->ToString();
 			String^ capacity = row->Cells["Вместимость"]->Value->ToString();
 			String^ baggageWeight = row->Cells["ВесБагажа"]->Value->ToString();
 			String^ year = row->Cells["ГодВводаВЭксплуатацию"]->Value->ToString();
-
-			// Откройте новую форму и передайте данные
-			AirplaneForm^ airplaneForm = gcnew AirplaneForm(airplaneId, model, capacity, baggageWeight, year);
+			String^ status = row->Cells["Статус"]->Value->ToString();
+			String^ lastServiceDate = row->Cells["ДатаПоследнегоОбслуживания"]->Value->ToString();
+			AirplaneForm^ airplaneForm = gcnew AirplaneForm(airplaneId, model, capacity, baggageWeight, year, status, lastServiceDate);
 			airplaneForm->ShowDialog();
+		}
+	}
+
+	void AirplanesForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		String^ airplaneId = txtModel->Text; // Используем txtModel для ввода Id самолета
+		String^ status = txtYear->Text;
+
+		String^ query = "SELECT * FROM Самолет WHERE 1=1";
+
+		if (!String::IsNullOrEmpty(airplaneId))
+		{
+			query += " AND Id = @id"; // Поиск по Id самолета
+		}
+
+		if (!String::IsNullOrEmpty(status))
+		{
+			query += " AND Статус = @status";
+		}
+
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		sqlConnection = gcnew SqlConnection(connectionString);
+		SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+
+		if (!String::IsNullOrEmpty(airplaneId))
+		{
+			command->Parameters->AddWithValue("@id", airplaneId); // Параметр для Id
+		}
+
+		if (!String::IsNullOrEmpty(status))
+		{
+			command->Parameters->AddWithValue("@status", status);
+		}
+
+		sqlConnection->Open();
+		SqlDataReader^ reader = command->ExecuteReader();
+		dataGridViewAirplanes->Rows->Clear();
+
+		bool found = false;
+
+		while (reader->Read())
+		{
+			dataGridViewAirplanes->Rows->Add(
+				reader["Id"]->ToString(),
+				reader["Модель"]->ToString(),
+				reader["Вместимость"]->ToString(),
+				reader["ВесБагажа"]->ToString(),
+				reader["ГодВводаВЭксплуатацию"]->ToString(),
+				reader["Статус"]->ToString(),
+				reader["ДатаПоследнегоОбслуживания"]->ToString()
+			);
+			found = true;
+		}
+
+		reader->Close();
+		sqlConnection->Close();
+
+		if (!found)
+		{
+			LoadAirplanes();
+			MessageBox::Show("Самолет с указанным Id или статусом не найден.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		}
+	}
+
+	void AirplanesForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		txtModel->Clear();
+		txtYear->Clear();
+
+		LoadAirplanes();
+	}
+
+	void AirplanesForm::UpdateTablo(System::Object^ sender, System::EventArgs^ e)
+	{
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		sqlConnection = gcnew SqlConnection(connectionString);
+
+		try
+		{
+			sqlConnection->Open();
+
+			SqlCommand^ command = gcnew SqlCommand("EXEC dbo.UpdateAircraftStatusForInspection", sqlConnection);
+			command->ExecuteNonQuery();
+
+			LoadAirplanes();
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show("Ошибка при обновлении статуса самолетов: " + ex->Message, "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		}
+		finally
+		{
+			sqlConnection->Close();
 		}
 	}
 }

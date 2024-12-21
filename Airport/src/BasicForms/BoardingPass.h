@@ -20,19 +20,23 @@ namespace Airport
 	public:
 		BoardingPassForm();
 		~BoardingPassForm();
+		void LoadBoardingPass();
 	private:
 		void InitializeComponent(void);
-		void LoadBoardingPass();
 		void dataGridViewBoardingPass_CellDoubleClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
 		void btnEdit_Click(Object^ sender, EventArgs^ e);
+		void btnDelete_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
 
 		MaterialSingleLineTextField^ txtId;
 		MaterialSingleLineTextField^ txtPasId;
 		MaterialSingleLineTextField^ txtTicket;
 
 		MaterialFlatButton^ btnSearch;
-		MaterialFlatButton^ btnEdit;
-		MaterialFlatButton^ btnDelete;
+		MaterialFlatButton^ btnClear;
+		MaterialRaisedButton^ btnEdit;
+		MaterialRaisedButton^ btnDelete;
 
 		Panel^ panelButtons;
 		DataGridView^ dataGridViewBoardingPass;

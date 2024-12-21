@@ -20,19 +20,23 @@ namespace Airport
 	public:
 		BaggageForm(void);
 		~BaggageForm();
+		void LoadBaggage();
 	private:
 		void InitializeComponent(void);
-		void LoadBaggage();
 		void dataGridViewBaggage_CellDoubleClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
 		void btnEdit_Click(Object^ sender, EventArgs^ e);
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnDelete_Click(System::Object^ sender, System::EventArgs^ e);
 
 		MaterialSingleLineTextField^ txtId;
 		MaterialSingleLineTextField^ txtTalon;
 		MaterialSingleLineTextField^ txtTicket;
 
 		MaterialFlatButton^ btnSearch;
-		MaterialFlatButton^ btnEdit;
-		MaterialFlatButton^ btnDelete;
+		MaterialFlatButton^ btnClear;
+		MaterialRaisedButton^ btnEdit;
+		MaterialRaisedButton^ btnDelete;
 
 		Panel^ panelButtons;
 

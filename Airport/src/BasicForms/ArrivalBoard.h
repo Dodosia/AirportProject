@@ -27,12 +27,21 @@ namespace Airport
 		void LoadWebBrowser();
 		void dataGridViewDepBoard_CellEndEdit(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
 		void UpdateFlightStatusInDatabase(String^ flightId, String^ newStatus);
+		void UpdateTablo(System::Object^ sender, System::EventArgs^ e);
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
+		void dataGridViewDepBoard_CellBeginEdit(Object^ sender, DataGridViewCellCancelEventArgs^ e);
+		void UpdateFlightStatusAndTimeInDatabase(String^ flightId, String^ newStatus, String^ newTime);
+		void dataGridViewDepBoard_CellFormatting(System::Object^ sender, System::Windows::Forms::DataGridViewCellFormattingEventArgs^ e);
 
+		System::Windows::Forms::Timer^ updateTimer;
 		MaterialSingleLineTextField^ txtFlight;
 		MaterialFlatButton^ btnSearch;
+		MaterialFlatButton^ btnClear;
 		WebBrowser^ webBrowser;
 		DataGridView^ dataGridViewArBoard;
 		SqlConnection^ sqlConnection;
 		System::ComponentModel::IContainer^ components;
+		String^ previousStatus;
 	};
 }

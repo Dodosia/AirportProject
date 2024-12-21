@@ -220,13 +220,18 @@
     <Reference Include="MaterialSkin">
       <HintPath>..\packages\MaterialSkin.0.2.1\lib\MaterialSkin.dll</HintPath>
     </Reference>
+    <Reference Include="zxing">
+      <HintPath>..\packages\ZXing.Net.0.16.9\lib\net40\zxing.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AdditionalForms\Airplane.h" />
+    <ClInclude Include="src\AdditionalForms\AirplaneReport.h" />
     <ClInclude Include="src\AdditionalForms\MakeBaggage.h" />
     <ClInclude Include="src\AdditionalForms\MakeNewBaggage.h" />
     <ClInclude Include="src\AdditionalForms\MakeNewPass.h" />
     <ClInclude Include="src\AdditionalForms\MakePass.h" />
+    <ClInclude Include="src\AdditionalForms\SeatSelectionForm.h" />
     <ClInclude Include="src\BasicForms\Airplanes.h" />
     <ClInclude Include="src\BasicForms\Airports.h" />
     <ClInclude Include="src\BasicForms\ArrivalBoard.h" />
@@ -243,10 +248,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AdditionalForms\Airplane.cpp" />
+    <ClCompile Include="src\AdditionalForms\AirplaneReport.cpp" />
     <ClCompile Include="src\AdditionalForms\MakeBaggage.cpp" />
     <ClCompile Include="src\AdditionalForms\MakeNewBaggage.cpp" />
     <ClCompile Include="src\AdditionalForms\MakeNewPass.cpp" />
     <ClCompile Include="src\AdditionalForms\MakePass.cpp" />
+    <ClCompile Include="src\AdditionalForms\SeatSelectionForm.cpp" />
     <ClCompile Include="src\BasicForms\Airplanes.cpp" />
     <ClCompile Include="src\BasicForms\Airports.cpp" />
     <ClCompile Include="src\BasicForms\ArrivalBoard.cpp" />
@@ -255,6 +262,8 @@
     <ClCompile Include="src\BasicForms\DepartureBoard.cpp" />
     <ClCompile Include="src\BasicForms\Flights.cpp" />
     <ClCompile Include="src\BasicForms\Passangers.cpp" />
+    <ClCompile Include="src\BasicForms\TechFlightsForm.cpp" />
+    <ClCompile Include="src\BasicForms\TechFlightsForm.h" />
     <ClCompile Include="src\BasicForms\Tickets.cpp" />
     <ClCompile Include="src\LoginForm.cpp" />
     <ClCompile Include="src\Menu\MenuAgent.cpp" />

@@ -19,14 +19,19 @@ namespace Airport
 	public:
 		AirplanesForm();
 		~AirplanesForm();
+
+		void LoadAirplanes();
 	private:
 		void InitializeComponent(void);
-		void LoadAirplanes();
 		void dataGridViewAirplanes_CellDoubleClick(Object^ sender, DataGridViewCellEventArgs^ e);
-
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
+		void UpdateTablo(System::Object^ sender, System::EventArgs^ e);
+		System::Windows::Forms::Timer^ updateTimer;
 		MaterialSingleLineTextField^ txtModel;
 		MaterialSingleLineTextField^ txtYear;
 		MaterialFlatButton^ btnSearch;
+		MaterialFlatButton^ btnClear;
 		DataGridView^ dataGridViewAirplanes;
 		SqlConnection^ sqlConnection;
 		System::ComponentModel::IContainer^ components;

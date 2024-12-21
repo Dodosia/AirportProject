@@ -73,7 +73,14 @@ namespace Airport
 		this->btnSearch = gcnew MaterialFlatButton();
 		this->btnSearch->Text = "Найти";
 		this->btnSearch->Location = System::Drawing::Point(720, 15);
+		this->btnSearch->Click += gcnew System::EventHandler(this, &BaggageForm::btnSearch_Click);
 		this->Controls->Add(this->btnSearch);
+
+		this->btnClear = gcnew MaterialFlatButton();
+		this->btnClear->Text = "Очистить";
+		this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+		this->btnClear->Click += gcnew System::EventHandler(this, &BaggageForm::btnClear_Click);
+		this->Controls->Add(this->btnClear);
 
 		this->panelButtons = gcnew System::Windows::Forms::Panel();
 		this->panelButtons->Dock = System::Windows::Forms::DockStyle::Bottom;
@@ -81,13 +88,15 @@ namespace Airport
 		this->panelButtons->Size = System::Drawing::Size(300, 60);
 		this->panelButtons->Location = System::Drawing::Point(800, 100);
 
-		this->btnEdit = gcnew MaterialFlatButton();
-		this->btnEdit->Text = "Создать бирку";
+		this->btnEdit = gcnew MaterialRaisedButton();
+		this->btnEdit->Text = "Добавит багаж";
 		this->btnEdit->Size = System::Drawing::Size(120, 40);
 		this->btnEdit->Click += gcnew EventHandler(this, &BaggageForm::btnEdit_Click);
 
-		this->btnDelete = gcnew MaterialFlatButton();
+		this->btnDelete = gcnew MaterialRaisedButton();
 		this->btnDelete->Text = "Удалить";
+		this->btnDelete->Size = System::Drawing::Size(120, 40);
+		this->btnDelete->Click += gcnew System::EventHandler(this, &BaggageForm::btnDelete_Click);
 		this->btnDelete->Size = System::Drawing::Size(120, 40);
 
 		this->btnEdit->Location = System::Drawing::Point(600, 10);
@@ -142,5 +151,119 @@ namespace Airport
 		Form^ makePassForm = gcnew MakeNewBaggageForm();
 
 		makePassForm->Show();
+	}
+
+	void BaggageForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		String^ searchQuery = "SELECT * FROM Багаж WHERE 1=1";
+
+		if (!String::IsNullOrEmpty(txtId->Text))
+		{
+			searchQuery += " AND Id = @Id";
+		}
+
+		if (!String::IsNullOrEmpty(txtTalon->Text))
+		{
+			searchQuery += " AND IdТалона = @IdТалона";
+		}
+
+		SqlCommand^ command = gcnew SqlCommand(searchQuery, sqlConnection);
+
+		if (!String::IsNullOrEmpty(txtId->Text))
+		{
+			command->Parameters->AddWithValue("@Id", txtId->Text);
+		}
+
+		if (!String::IsNullOrEmpty(txtTalon->Text))
+		{
+			command->Parameters->AddWithValue("@IdТалона", txtTalon->Text);
+		}
+
+		dataGridViewBaggage->Rows->Clear();
+
+		if (String::IsNullOrEmpty(txtId->Text) && String::IsNullOrEmpty(txtTalon->Text)) {
+			LoadBaggage();
+			return;
+		}
+
+		sqlConnection->Open();
+		SqlDataReader^ reader = command->ExecuteReader();
+
+		bool found = false;
+
+		while (reader->Read())
+		{
+			dataGridViewBaggage->Rows->Add(
+				reader["Id"]->ToString(),
+				reader["IdТалона"]->ToString(),
+				reader["Вес"]->ToString(),
+				reader["Описание"]->ToString()
+			);
+			found = true;
+		}
+
+		reader->Close();
+		sqlConnection->Close();
+
+		if (!found)
+		{
+			LoadBaggage();
+			MessageBox::Show("Багажная бирка, соответствующая заданным параметрам, не найдена.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		}
+	}
+
+	void BaggageForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		txtId->Clear();
+		txtTalon->Clear();
+		LoadBaggage();
+	}
+
+	void BaggageForm::btnDelete_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		if (dataGridViewBaggage->SelectedRows->Count == 0)
+		{
+			MessageBox::Show("Пожалуйста, выберите талон для удаления.", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			return;
+		}
+
+		int rowIndex = dataGridViewBaggage->SelectedRows[0]->Index;
+		String^ ticketNumber = dataGridViewBaggage->Rows[rowIndex]->Cells["Id"]->Value->ToString();
+
+		System::Windows::Forms::DialogResult result = MessageBox::Show("Вы уверены, что хотите удалить эту бирку?", "Удалить бирку", MessageBoxButtons::YesNo, MessageBoxIcon::Warning);
+
+		if (result == System::Windows::Forms::DialogResult::Yes)
+		{
+			String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+			SqlConnection^ sqlConnection = gcnew SqlConnection(connectionString);
+
+			SqlCommand^ command = gcnew SqlCommand("DELETE FROM Багаж WHERE Id = @ticketNumber", sqlConnection);
+			command->Parameters->AddWithValue("@ticketNumber", ticketNumber);
+
+			try
+			{
+				sqlConnection->Open();
+				int rowsAffected = command->ExecuteNonQuery();
+
+				if (rowsAffected > 0)
+				{
+					// Remove the row from the DataGridView if deletion was successful
+					dataGridViewBaggage->Rows->RemoveAt(rowIndex);
+					MessageBox::Show("Бирка была успешно удалена.", "Удаление успешно", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				}
+				else
+				{
+					MessageBox::Show("Не удалось удалить бирку. Попробуйте снова.", "Ошибка удаления", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				}
+			}
+			catch (Exception^ ex)
+			{
+				MessageBox::Show("Ошибка при удалении бирки: " + ex->Message, "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			}
+			finally
+			{
+				sqlConnection->Close();
+			}
+		}
 	}
 }

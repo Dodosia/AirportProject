@@ -47,9 +47,9 @@ namespace Airport
         this->dataGridViewAeroports->Location = System::Drawing::Point(20, 80);
         this->dataGridViewAeroports->Size = System::Drawing::Size(this->ClientSize.Width - this->dataGridViewAeroports->Location.X - rightMargin, this->ClientSize.Height - this->dataGridViewAeroports->Location.Y - bottomMargin);
         this->dataGridViewAeroports->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Bottom | AnchorStyles::Left | AnchorStyles::Right);
-        this->dataGridViewAeroports->Columns->Add("Код", "Номер");
-        this->dataGridViewAeroports->Columns->Add("Страна", "Id Самолета");
-        this->dataGridViewAeroports->Columns->Add("Город", "Аэропорт вылета");
+        this->dataGridViewAeroports->Columns->Add("Код", "Код");
+        this->dataGridViewAeroports->Columns->Add("Страна", "Страна");
+        this->dataGridViewAeroports->Columns->Add("Город", "Город");
         this->dataGridViewAeroports->ReadOnly = true;
         this->Controls->Add(this->dataGridViewAeroports);
 
@@ -80,7 +80,14 @@ namespace Airport
         this->btnSearch = gcnew MaterialFlatButton();
         this->btnSearch->Text = "Найти";
         this->btnSearch->Location = System::Drawing::Point(1020, 15);
+        this->btnSearch->Click += gcnew System::EventHandler(this, &AirportsForm::btnSearch_Click);
         this->Controls->Add(this->btnSearch);
+
+        this->btnClear = gcnew MaterialFlatButton();
+        this->btnClear->Text = "Очистить";
+        this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+        this->btnClear->Click += gcnew System::EventHandler(this, &AirportsForm::btnClear_Click);
+        this->Controls->Add(this->btnClear);
 	}
 
 	void AirportsForm::loadAirports()
@@ -105,4 +112,73 @@ namespace Airport
 
         reader->Close();
 	}
+
+    void AirportsForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        dataGridViewAeroports->Rows->Clear();
+
+        String^ query = "SELECT * FROM Аэропорт WHERE 1=1";  // Base query
+
+        if (!String::IsNullOrWhiteSpace(txtNumber->Text))
+        {
+            query += " AND Код LIKE '%" + txtNumber->Text + "%'";
+        }
+
+        if (!String::IsNullOrWhiteSpace(txtAirport->Text))
+        {
+            query += " AND Страна LIKE '%" + txtAirport->Text + "%'";
+        }
+
+        if (!String::IsNullOrWhiteSpace(txtTown->Text))
+        {
+            query += " AND Город LIKE '%" + txtTown->Text + "%'";
+        }
+
+        String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+        sqlConnection = gcnew SqlConnection(connectionString);
+        SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+
+        bool found = false;
+
+        try
+        {
+            sqlConnection->Open();
+            SqlDataReader^ reader = command->ExecuteReader();
+
+            while (reader->Read())
+            {
+                dataGridViewAeroports->Rows->Add(
+                    reader["Код"]->ToString(),
+                    reader["Страна"]->ToString(),
+                    reader["Город"]->ToString()
+                );
+                found = true;
+            }
+         
+            reader->Close();
+        }
+        catch (Exception^ ex)
+        {
+            MessageBox::Show("Error: " + ex->Message);
+        }
+        finally
+        {
+            sqlConnection->Close();
+        }
+
+        if (!found)
+        {
+            loadAirports();
+            MessageBox::Show("Аэропорт, соответствующий заданным параметрам, не найден.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+        }
+    }
+
+    void AirportsForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        txtNumber->Text = "";
+        txtAirport->Text = "";
+        txtTown->Text = "";
+
+        loadAirports();
+    }
 }

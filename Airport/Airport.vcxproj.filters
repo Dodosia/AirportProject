@@ -108,6 +108,8 @@
     <ClInclude Include="src\Menu\MenuTech.h">
       <Filter>Headers\Airport\src\Menu</Filter>
     </ClInclude>
+    <ClInclude Include="src\AdditionalForms\AirplaneReport.h" />
+    <ClInclude Include="src\AdditionalForms\SeatSelectionForm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AdditionalForms\Airplane.cpp">
@@ -167,6 +169,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Sources\Airport\src</Filter>
     </ClCompile>
+    <ClCompile Include="src\AdditionalForms\AirplaneReport.cpp" />
+    <ClCompile Include="src\AdditionalForms\SeatSelectionForm.cpp" />
+    <ClCompile Include="src\BasicForms\TechFlightsForm.h" />
+    <ClCompile Include="src\BasicForms\TechFlightsForm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\BasicForms\Flights.resx">

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AdditionalForms/MakeNewPass.h"
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -20,6 +21,9 @@ namespace Airport
 	private:
 		void InitializeComponent(void);
 		void LoadTickets();
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
+		void dataGridViewTickets_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
 
 		MaterialSingleLineTextField^ txtId;
 		MaterialSingleLineTextField^ txtPasId;
@@ -27,6 +31,7 @@ namespace Airport
 		MaterialSingleLineTextField^ txtDate;
 
 		MaterialFlatButton^ btnSearch;
+		MaterialFlatButton^ btnClear;
 
 		DataGridView^ dataGridViewTickets;
 		SqlConnection^ sqlConnection;

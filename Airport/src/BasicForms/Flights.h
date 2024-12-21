@@ -21,12 +21,16 @@ namespace Airport
 		void InitializeComponent(void);
 		void LoadFlights();
 
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
+
 		DataGridView^ dataGridViewFlights;
 		ListView^ listViewFlights;
 		SqlConnection^ sqlConnection;
 		MaterialSingleLineTextField^ txtNumber;
 		MaterialSingleLineTextField^ txtAirport;
 		MaterialFlatButton^ btnSearch;
+		MaterialFlatButton^ btnClear;
 
 		IContainer^ components;
 	};

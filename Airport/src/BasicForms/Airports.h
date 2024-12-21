@@ -20,6 +20,8 @@ namespace Airport
 	private:
 		void InitializeComponent(void);
 		void loadAirports();
+		void btnSearch_Click(System::Object^ sender, System::EventArgs^ e);
+		void btnClear_Click(System::Object^ sender, System::EventArgs^ e);
 
 		DataGridView^ dataGridViewAeroports;
 		SqlConnection^ sqlConnection;
@@ -28,6 +30,7 @@ namespace Airport
 		MaterialSingleLineTextField^ txtAirport;
 		MaterialSingleLineTextField^ txtTown;
 		MaterialFlatButton^ btnSearch;
+		MaterialFlatButton^ btnClear;
 	};
 
 

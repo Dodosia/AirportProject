@@ -23,6 +23,7 @@ namespace Airport
 		this->Text = "Главное меню: Авиатехник";
 		this->Size = System::Drawing::Size(1500, 1000);
 		this->StartPosition = FormStartPosition::CenterScreen;
+		this->Name = "MenuTechForm";
 
 		tabControl = gcnew MaterialTabControl();
 		tabControl->Dock = DockStyle::Fill;
@@ -47,15 +48,12 @@ namespace Airport
 		airplaneTab = gcnew TabPage("Самолеты");
 		tabControl->TabPages->Add(airplaneTab);
 
-		airportTab = gcnew TabPage("Аэропорты");
-		tabControl->TabPages->Add(airportTab);
-
-		Form^ flightsForm = gcnew FlightsForm();
-		flightsForm->TopLevel = false;
-		flightsForm->FormBorderStyle = System::Windows::Forms::FormBorderStyle::None;
-		flightsForm->Dock = DockStyle::Fill;
-		flightsTab->Controls->Add(flightsForm);
-		flightsForm->Show();
+		Form^ TechFlightsForm = gcnew TechFlight();
+		TechFlightsForm->TopLevel = false;
+		TechFlightsForm->FormBorderStyle = System::Windows::Forms::FormBorderStyle::None;
+		TechFlightsForm->Dock = DockStyle::Fill;
+		flightsTab->Controls->Add(TechFlightsForm);
+		TechFlightsForm->Show();
 
 		Form^ depBoardForm = gcnew DepartureBoardForm();
 		depBoardForm->TopLevel = false;
@@ -77,13 +75,6 @@ namespace Airport
 		airplanesForm->Dock = DockStyle::Fill;
 		airplaneTab->Controls->Add(airplanesForm);
 		airplanesForm->Show();
-
-		Form^ airportForm = gcnew AirportsForm();
-		airportForm->TopLevel = false;
-		airportForm->FormBorderStyle = System::Windows::Forms::FormBorderStyle::None;
-		airportForm->Dock = DockStyle::Fill;
-		airportTab->Controls->Add(airportForm);
-		airportForm->Show();
 
 		Label^ lblDispatcher = gcnew Label();
 		lblDispatcher->Text = "АВИАТЕХНИК";

@@ -50,14 +50,14 @@ namespace Airport
 		logoPictureBox->BringToFront();
 		this->Controls->Add(logoPictureBox);
 
-		MaterialSingleLineTextField^ loginField = gcnew MaterialSingleLineTextField();
+		loginField = gcnew MaterialSingleLineTextField();
 		loginField->Hint = "Логин";
 		loginField->Size = System::Drawing::Size(200, 40);
 		loginField->ForeColor = System::Drawing::Color::Black;
 		loginField->Location = System::Drawing::Point((this->ClientSize.Width - loginField->Width) / 2, 350);
 		this->Controls->Add(loginField);
 
-		MaterialSingleLineTextField^ passwordField = gcnew MaterialSingleLineTextField();
+		passwordField = gcnew MaterialSingleLineTextField();
 		passwordField->Hint = "Пароль";
 		passwordField->Size = System::Drawing::Size(200, 100);
 		passwordField->ForeColor = System::Drawing::Color::Black;
@@ -76,14 +76,28 @@ namespace Airport
 
 	void EntryPoint::OnMyButtonClick(Object^ sender, EventArgs^ e)
 	{
-		Form^ form = gcnew MenuAgentForm();
-		form->Show();
+		String^ login = loginField->Text;
+		String^ password = passwordField->Text;
 
-		Form^ form2 = gcnew MenuTechForm();
-		form2->Show();
-
-		Form^ form3 = gcnew MenuDispForm();
-		form3->Show();
+		if (login == "агент" && password == "123")
+		{
+			Form^ form = gcnew MenuAgentForm();
+			form->Show();
+		}
+		else if (login == "авиатехник" && password == "123")
+		{
+			Form^ form = gcnew MenuTechForm();
+			form->Show();
+		}
+		else if (login == "авиадиспетчер" && password == "123")
+		{
+			Form^ form = gcnew MenuDispForm();
+			form->Show();
+		}
+		else
+		{
+			MessageBox::Show("Неверный логин или пароль", "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+		}
 	}
 }
 

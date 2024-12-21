@@ -1,10 +1,10 @@
 #pragma once
 
-#include "BasicForms/Flights.h"
 #include "BasicForms/DepartureBoard.h"
 #include "BasicForms/ArrivalBoard.h"
 #include "BasicForms/Airplanes.h"
 #include "BasicForms/Airports.h"
+#include "BasicForms/TechFlightsForm.h"
 
 using namespace System;
 using namespace System::ComponentModel;
@@ -22,6 +22,7 @@ namespace Airport
 	public:
 		MenuTechForm(void);
 		~MenuTechForm();
+		TabPage^ airplaneTab;
 	protected:
 		//virtual void OnPaint(PaintEventArgs^ e) override;
 	private:
@@ -33,8 +34,7 @@ namespace Airport
 		TabPage^ flightsTab;
 		TabPage^ depBoardTab;
 		TabPage^ arBoardTab;
-		TabPage^ airplaneTab;
-		TabPage^ airportTab;
+
 
 		System::ComponentModel::IContainer^ components;
 		System::Windows::Forms::Button^ flightsButton;

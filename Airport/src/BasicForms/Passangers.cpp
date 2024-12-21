@@ -54,7 +54,7 @@ namespace Airport
 		this->dataGridViewPassangers->Columns->Add("Пол", "Пол");
 		this->dataGridViewPassangers->Columns->Add("Телефон", "Телефон");
 		this->dataGridViewPassangers->ReadOnly = true;
-
+		//this->dataGridViewPassangers->CellDoubleClick += gcnew DataGridViewCellEventHandler(this, &PassangersForm::dataGridViewPassengers_CellClick);
 		this->Controls->Add(this->dataGridViewPassangers);
 
 		this->txtFio = gcnew MaterialSingleLineTextField();
@@ -81,7 +81,14 @@ namespace Airport
 		this->btnSearch = gcnew MaterialFlatButton();
 		this->btnSearch->Text = "Найти";
 		this->btnSearch->Location = System::Drawing::Point(1070, 15);
+		this->btnSearch->Click += gcnew System::EventHandler(this, &PassangersForm::btnSearch_Click);
 		this->Controls->Add(this->btnSearch);
+
+		this->btnClear = gcnew MaterialFlatButton();
+		this->btnClear->Text = "Очистить";
+		this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+		this->btnClear->Click += gcnew System::EventHandler(this, &PassangersForm::btnClear_Click);
+		this->Controls->Add(this->btnClear);
 	}
 
 	void PassangersForm::LoadPassangers()
@@ -109,5 +116,123 @@ namespace Airport
 
 		reader->Close();
 		sqlConnection->Close();
+	}
+
+	void PassangersForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		String^ fio = this->txtFio->Text;
+		String^ passport = this->txtPassport->Text;
+		String^ phone = this->txtPhone->Text;
+
+		dataGridViewPassangers->Rows->Clear();
+
+		if (String::IsNullOrEmpty(fio) && String::IsNullOrEmpty(passport) && String::IsNullOrEmpty(phone)) {
+			LoadPassangers();
+			return;
+		}
+
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		sqlConnection = gcnew SqlConnection(connectionString);
+
+		String^ query = "SELECT * FROM Пассажир WHERE 1 = 1";
+
+		if (!String::IsNullOrEmpty(fio)) {
+			query += " AND Фио LIKE @fio";
+		}
+		if (!String::IsNullOrEmpty(passport)) {
+			query += " AND Паспорт LIKE @passport";
+		}
+		if (!String::IsNullOrEmpty(phone)) {
+			query += " AND Телефон LIKE @phone";
+		}
+
+		SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+
+		if (!String::IsNullOrEmpty(fio)) {
+			command->Parameters->AddWithValue("@fio", "%" + fio + "%");
+		}
+		if (!String::IsNullOrEmpty(passport)) {
+			command->Parameters->AddWithValue("@passport", "%" + passport + "%");
+		}
+		if (!String::IsNullOrEmpty(phone)) {
+			command->Parameters->AddWithValue("@phone", "%" + phone + "%");
+		}
+
+		sqlConnection->Open();
+		SqlDataReader^ reader = command->ExecuteReader();
+
+		bool found = false;
+
+		while (reader->Read())
+		{
+			dataGridViewPassangers->Rows->Add(
+				reader["Id"]->ToString(),
+				reader["Фио"]->ToString(),
+				reader["Паспорт"]->ToString(),
+				reader["ДатаРождения"]->ToString(),
+				reader["Пол"]->ToString(),
+				reader["Телефон"]->ToString()
+			);
+			found = true;
+		}
+
+		reader->Close();
+		sqlConnection->Close();
+
+		if (!found)
+		{
+			LoadPassangers();
+			MessageBox::Show("Ни один пассажир, соответствующий заданным параметрам, не найден.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		}
+	}
+
+	void PassangersForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		this->txtFio->Text = "";
+		this->txtPassport->Text = "";
+		this->txtPhone->Text = "";
+
+		dataGridViewPassangers->Rows->Clear();
+
+		LoadPassangers();
+	}
+
+	void PassangersForm::dataGridViewPassengers_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e)
+	{
+		if (e->RowIndex < 0) return;
+
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		sqlConnection = gcnew SqlConnection(connectionString);
+
+		int passengerId = Convert::ToInt32(dataGridViewPassangers->Rows[e->RowIndex]->Cells["Id"]->Value);
+
+		String^ ticketId = "Не найден";
+
+		sqlConnection->Open();
+		SqlCommand^ cmd = gcnew SqlCommand("SELECT Номер FROM Билет WHERE IdПассажира = @passengerID", sqlConnection);
+		cmd->Parameters->AddWithValue("@passengerID", passengerId);
+
+		Object^ result = cmd->ExecuteScalar();
+
+		if (result != nullptr)
+		{
+			ticketId = result->ToString();
+		}
+		else
+		{
+			MessageBox::Show("Билет для пассажира не найден.");
+			return;
+		}
+
+		sqlConnection->Close();
+		
+
+		Form^ makePassForm = gcnew MakeNewPassForm(ticketId);
+		makePassForm->Show();
+	}
+
+	bool PassangersForm::CheckIfPassExists(int passengerId)
+	{
+		return false;
 	}
 }

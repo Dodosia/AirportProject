@@ -2,10 +2,94 @@
 
 namespace Airport
 {
+	public ref class DelayTimeForm : public System::Windows::Forms::Form
+	{
+	public:
+		property String^ SelectedTime;
+
+		DelayTimeForm(String^ currentTime)
+		{
+			InitializeComponent();
+
+			DateTime defaultTime;
+			if (DateTime::TryParse(currentTime, defaultTime))
+			{
+				this->dateTimePicker->Value = defaultTime;
+			}
+
+			DateTime minTime;
+			if (DateTime::TryParse(currentTime, minTime))
+			{
+				this->dateTimePicker->MinDate = minTime;
+			}
+		}
+
+	private:
+		void InitializeComponent()
+		{
+			System::Drawing::Icon^ icon = gcnew System::Drawing::Icon("main_logo.ico");
+			this->Icon = icon;
+			this->Text = "Изменить время";
+			this->Size = System::Drawing::Size(100, 50);
+			this->StartPosition = FormStartPosition::CenterScreen;
+
+			this->Width = 300;
+			this->Height = 150;
+
+			this->dateTimePicker = gcnew System::Windows::Forms::DateTimePicker();
+			this->dateTimePicker->Format = System::Windows::Forms::DateTimePickerFormat::Time;
+			this->dateTimePicker->ShowUpDown = true;
+			this->dateTimePicker->Size = System::Drawing::Size(160, 40);
+			this->dateTimePicker->Font = gcnew System::Drawing::Font(L"Segoe UI", 14); // Увеличенный шрифт
+			this->dateTimePicker->Location = System::Drawing::Point(
+				(this->ClientSize.Width - this->dateTimePicker->Width) / 2,  // Центр по ширине
+				20                                                          // Отступ сверху
+			);
+
+			this->btnOK = gcnew System::Windows::Forms::Button();
+			this->btnOK->Text = "OK";
+			this->btnOK->Size = System::Drawing::Size(80, 30);
+			this->btnOK->Location = System::Drawing::Point(
+				(this->ClientSize.Width - this->btnOK->Width) / 2,  // Центр по ширине
+				this->dateTimePicker->Bottom + 20                  // Отступ под DateTimePicker
+			);
+			this->btnOK->Click += gcnew System::EventHandler(this, &DelayTimeForm::btnOK_Click);
+
+			this->Controls->Add(this->dateTimePicker);
+			this->Controls->Add(this->btnOK);
+		}
+
+		void btnOK_Click(System::Object^ sender, System::EventArgs^ e)
+		{
+			if (this->dateTimePicker->Value < this->dateTimePicker->MinDate)
+			{
+				MessageBox::Show(
+					"Выбранное время не может быть раньше времени отправления!",
+					"Ошибка",
+					MessageBoxButtons::OK,
+					MessageBoxIcon::Error
+				);
+				return;
+			}
+
+			this->SelectedTime = this->dateTimePicker->Value.ToShortTimeString();
+			this->DialogResult = System::Windows::Forms::DialogResult::OK;
+			this->Close();
+		}
+
+		System::Windows::Forms::DateTimePicker^ dateTimePicker;
+		System::Windows::Forms::Button^ btnOK;
+	};
+
     DepartureBoardForm::DepartureBoardForm()
     {
         InitializeComponent();
         LoadFlights();
+
+		updateTimer = gcnew System::Windows::Forms::Timer();
+		updateTimer->Interval = 60000;
+		updateTimer->Tick += gcnew EventHandler(this, &DepartureBoardForm::UpdateTablo);
+		updateTimer->Start();
     }
 
     DepartureBoardForm::~DepartureBoardForm()
@@ -46,16 +130,16 @@ namespace Airport
 		this->dataGridViewDepBoard->Size = System::Drawing::Size(this->ClientSize.Width - 2 * rightMargin, 300);
 		this->dataGridViewDepBoard->Location = System::Drawing::Point(rightMargin, 80);
 		this->dataGridViewDepBoard->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right);
-
+		this->dataGridViewDepBoard->CellBeginEdit += gcnew DataGridViewCellCancelEventHandler(this, &DepartureBoardForm::dataGridViewDepBoard_CellBeginEdit);
 		this->dataGridViewDepBoard->RowTemplate->Height = 40;
 		this->dataGridViewDepBoard->Columns->Add("Id", "Id");
 		this->dataGridViewDepBoard->Columns->Add("НомерРейса", "Номер рейса");
-		this->dataGridViewDepBoard->Columns->Add("Время", "Время прибытия");
+		this->dataGridViewDepBoard->Columns->Add("Время", "Время отправления");
 
 		DataGridViewComboBoxColumn^ comboBoxColumn = gcnew DataGridViewComboBoxColumn();
 		comboBoxColumn->Name = "Статус";
 		comboBoxColumn->HeaderText = "Статус";
-		comboBoxColumn->DataSource = gcnew array<String^> { "Отменен", "Задержан", "Отправлен", "Регистрация" };
+		comboBoxColumn->DataSource = gcnew array<String^> { "Отменен", "Задержан", "Вылетел", "Идет регистрация", "Идет посадка", "Планируется" };
 		this->dataGridViewDepBoard->Columns->Add(comboBoxColumn);
 
 		this->dataGridViewDepBoard->CellEndEdit += gcnew DataGridViewCellEventHandler(this, &DepartureBoardForm::dataGridViewDepBoard_CellEndEdit);
@@ -79,34 +163,56 @@ namespace Airport
 		this->btnSearch = gcnew MaterialFlatButton();
 		this->btnSearch->Text = "Найти";
 		this->btnSearch->Location = System::Drawing::Point(370, 15);
+		this->btnSearch->Click += gcnew System::EventHandler(this, &DepartureBoardForm::btnSearch_Click);
 		this->Controls->Add(this->btnSearch);
+
+		this->btnClear = gcnew MaterialFlatButton();
+		this->btnClear->Text = "Очистить";
+		this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+		this->btnClear->Click += gcnew System::EventHandler(this, &DepartureBoardForm::btnClear_Click);
+		this->Controls->Add(this->btnClear);
 
 		LoadWebBrowser();
     }
 
     void DepartureBoardForm::LoadFlights()
     {
-		dataGridViewDepBoard->Rows->Clear();
-
-		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
-		sqlConnection = gcnew SqlConnection(connectionString);
-		SqlCommand^ command = gcnew SqlCommand("SELECT * FROM ТаблоВылета", sqlConnection);
-
-		sqlConnection->Open();
-		SqlDataReader^ reader = command->ExecuteReader();
-
-		while (reader->Read())
+		try
 		{
-			dataGridViewDepBoard->Rows->Add(
-				reader["Id"]->ToString(),
-				reader["НомерРейса"]->ToString(),
-				reader["Время"]->ToString(),
-				reader["Статус"]->ToString()
-			);
-		}
+			dataGridViewDepBoard->Rows->Clear();
 
-		reader->Close();
-		sqlConnection->Close();
+			String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+			sqlConnection = gcnew SqlConnection(connectionString);
+			SqlCommand^ command = gcnew SqlCommand("UpdateTabloDeparture", sqlConnection);
+
+			sqlConnection->Open();
+			SqlDataReader^ reader = command->ExecuteReader();
+
+			if (!reader->HasRows)
+			{
+				MessageBox::Show("Нет данных для отображения");
+			}
+
+			while (reader->Read())
+			{
+				dataGridViewDepBoard->Rows->Add(
+					reader["Id"]->ToString(),
+					reader["НомерРейса"]->ToString(),
+					reader["Время"]->ToString(),
+					reader["Статус"]->ToString()
+				);
+			}
+
+			reader->Close();
+		}
+		catch (Exception^ e)
+		{
+			MessageBox::Show("Ошибка: " + e->Message);
+		}
+		finally
+		{
+			sqlConnection->Close();
+		}
     }
 
 	void DepartureBoardForm::LoadWebBrowser()
@@ -123,34 +229,31 @@ namespace Airport
 
 	void DepartureBoardForm::dataGridViewDepBoard_CellFormatting(System::Object^ sender, System::Windows::Forms::DataGridViewCellFormattingEventArgs^ e)
 	{
-		if (this->dataGridViewDepBoard->Columns[e->ColumnIndex]->Name == "Статус")
-		{
-			DataGridViewComboBoxCell^ comboBoxCell = dynamic_cast<DataGridViewComboBoxCell^>(this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells[e->ColumnIndex]);
-			if (comboBoxCell != nullptr)
-			{
-				String^ status = safe_cast<String^>(e->Value);
+		DataGridViewRow^ row = this->dataGridViewDepBoard->Rows[e->RowIndex];
 
-				if (status == "Отменен")
+		String^ status = safe_cast<String^>(row->Cells["Статус"]->Value);
+
+		if (status != nullptr)
+		{
+			if (status == "Задержан")
+			{
+				if (this->dataGridViewDepBoard->Columns[e->ColumnIndex]->Name == "Время")
 				{
-					e->CellStyle->BackColor = System::Drawing::Color::FromArgb(255, 220, 220); // Светло-красный
+					e->CellStyle->ForeColor = System::Drawing::Color::Red;
 				}
-				else if (status == "Задержан")
+			}
+			else if (status == "Отменен")
+			{
+				if (this->dataGridViewDepBoard->Columns[e->ColumnIndex]->Name != "Статус")
 				{
-					e->CellStyle->BackColor = System::Drawing::Color::FromArgb(255, 255, 230); // Светло-жёлтый
+					e->CellStyle->Font = gcnew System::Drawing::Font(e->CellStyle->Font,
+						System::Drawing::FontStyle::Strikeout);
 				}
-				else if (status == "Отправлен")
-				{
-					e->CellStyle->BackColor = System::Drawing::Color::FromArgb(220, 255, 220); // Светло-зелёный
-				}
-				else if (status == "Регистрация")
-				{
-					e->CellStyle->BackColor = System::Drawing::Color::FromArgb(220, 230, 255); // Светло-синий
-				}
-				else
-				{
-					e->CellStyle->BackColor = System::Drawing::Color::White; // Цвет по умолчанию
-				}
-				e->CellStyle->ForeColor = System::Drawing::Color::Black;
+			}
+			else
+			{
+				e->CellStyle->Font = gcnew System::Drawing::Font(e->CellStyle->Font,
+					System::Drawing::FontStyle::Regular);
 			}
 		}
 	}
@@ -162,7 +265,26 @@ namespace Airport
 			String^ newStatus = safe_cast<String^>(this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells["Статус"]->Value);
 			String^ flightId = safe_cast<String^>(this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells["Id"]->Value);
 
-			UpdateFlightStatusInDatabase(flightId, newStatus);
+			if (newStatus == "Задержан")
+			{
+				String^ currentTime = safe_cast<String^>(this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells["Время"]->Value);
+				DelayTimeForm^ delayForm = gcnew DelayTimeForm(currentTime);
+				if (delayForm->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+				{
+					String^ newTime = delayForm->SelectedTime;
+					UpdateFlightStatusAndTimeInDatabase(flightId, newStatus, newTime);
+					this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells
+						["Время"]->Value = newTime;
+				}
+				else
+				{
+					this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells["Статус"]->Value = previousStatus;
+				}
+			}
+			else
+			{
+				UpdateFlightStatusInDatabase(flightId, newStatus);
+			}
 		}
 	}
 
@@ -189,5 +311,122 @@ namespace Airport
 		{
 			sqlConnection->Close();
 		}
+	}
+
+	void DepartureBoardForm::UpdateFlightStatusAndTimeInDatabase(String^ flightId, String^ newStatus, String^ newTime)
+	{
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		SqlConnection^ sqlConnection = gcnew SqlConnection(connectionString);
+
+		try
+		{
+			sqlConnection->Open();
+			String^ query = "UPDATE ТаблоВылета SET Статус = @newStatus, Время = @newTime WHERE Id = @flightId";
+			SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+			command->Parameters->AddWithValue("@newStatus", newStatus);
+			command->Parameters->AddWithValue("@newTime", newTime);
+			command->Parameters->AddWithValue("@flightId", flightId);
+
+			command->ExecuteNonQuery();
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show("Ошибка обновления данных: " + ex->Message);
+		}
+		finally
+		{
+			sqlConnection->Close();
+		}
+	}
+
+	void DepartureBoardForm::UpdateTablo(System::Object^ sender, System::EventArgs^ e)
+	{
+		LoadFlights();
+	}
+
+	void DepartureBoardForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		String^ searchFlightNumber = txtFlight->Text->Trim();
+
+		bool found = false;
+
+		for each (DataGridViewRow ^ row in dataGridViewDepBoard->Rows)
+		{
+			if (row->Cells["НомерРейса"]->Value != nullptr)
+			{
+				if (row->Cells["НомерРейса"]->Value->ToString()->Contains(searchFlightNumber))
+				{
+					row->Visible = true;
+					found = true;
+				}
+				else
+				{
+					row->Visible = false;
+				}
+			}
+		}
+		if (!found)
+		{
+			for each (DataGridViewRow ^ row in dataGridViewDepBoard->Rows)
+			{
+				row->Visible = true;
+			}
+			MessageBox::Show("Рейс не найден.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		}
+	}
+
+	void DepartureBoardForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		txtFlight->Clear();
+
+		for each (DataGridViewRow ^ row in dataGridViewDepBoard->Rows)
+		{
+			row->Visible = true;
+		}
+	}
+
+	void DepartureBoardForm::dataGridViewDepBoard_CellBeginEdit(Object^ sender, DataGridViewCellCancelEventArgs^ e)
+	{
+		if (this->dataGridViewDepBoard->Columns[e->ColumnIndex]->Name == "Статус")
+		{
+			previousStatus = Convert::ToString(this->dataGridViewDepBoard->Rows[e->RowIndex]->Cells[e->ColumnIndex]->Value);
+
+			if (previousStatus == "Вылетел")
+			{
+				MessageBox::Show("Статус уже отправленного рейса нельзя изменить.", "Предупреждение", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+				e->Cancel = true;
+			}
+		}
+	}
+
+	void DepartureBoardForm::UpdateFlightTimeInDatabase(String^ flightId, DateTime^ newTime)
+	{
+		String^ connectionString = "Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;";
+		SqlConnection^ sqlConnection = gcnew SqlConnection(connectionString);
+
+		try
+		{
+			sqlConnection->Open();
+			String^ query = "UPDATE ТаблоВылета SET ВремяОтправления = @newTime WHERE Id = @flightId";
+			SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+			command->Parameters->AddWithValue("@newTime", newTime);
+			command->Parameters->AddWithValue("@flightId", flightId);
+
+			command->ExecuteNonQuery();
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show("Ошибка обновления времени: " + ex->Message);
+		}
+		finally
+		{
+			sqlConnection->Close();
+		}
+	}
+
+	void DepartureBoardForm::HighlightRowAsDelayed(int rowIndex)
+	{
+		DataGridViewRow^ row = dataGridViewDepBoard->Rows[rowIndex];
+		row->DefaultCellStyle->BackColor = System::Drawing::Color::FromArgb(255, 220, 220);
 	}
 }

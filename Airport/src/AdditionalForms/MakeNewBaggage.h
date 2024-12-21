@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Menu/MenuAgent.h"
+
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -17,16 +19,23 @@ namespace Airport
 	{
 	public:
 		MakeNewBaggageForm();
+		MakeNewBaggageForm(String^ passId);
 		~MakeNewBaggageForm();
+		void btnAdd_Click(Object^ sender, EventArgs^ e);
 	private:
 		void InitializeComponent();
 		void PrintPage(Object^ sender, PrintPageEventArgs^ e);
 		void btnMakeTag_Click(Object^ sender, EventArgs^ e);
+		int GetNextBaggageId();
 
+		Bitmap^ GenerateBarcode(String^ data);
+
+		ComboBox^ cmbDescription;
 		MaterialSingleLineTextField^ txtPassId;
 		MaterialSingleLineTextField^ txtId;
 		MaterialSingleLineTextField^ txtWeight;
 		MaterialSingleLineTextField^ txtDescription;
+		Label^ lblMaxWeight;
 
 		MaterialFlatButton^ btnAdd;
 		MaterialFlatButton^ btnMakeTag;

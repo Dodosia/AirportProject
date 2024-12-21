@@ -39,5 +39,8 @@ namespace Airport
 		System::Drawing::Point dragCursorPoint;
 		System::Drawing::Point dragFormPoint;
 		IContainer^ components;
+		MaterialSingleLineTextField^ loginField;
+		MaterialSingleLineTextField^ passwordField;
+
 	};
 }

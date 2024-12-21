@@ -5,9 +5,10 @@ namespace Airport
 {
     bool isGlutInitialized = false;
 
-    AirplaneForm::AirplaneForm(String^ airplaneId, String^ model, String^ capacity, String^ baggageWeight, String^ year)
+    AirplaneForm::AirplaneForm(String^ airplaneId, String^ model, String^ capacity, String^ baggageWeight, String^ year, String^ status, String^ lastServiceDate) : 
+        _airplaneId(airplaneId), _model(model), _capacity(capacity), _baggageWeight(baggageWeight), _year(year), _lastServiceDate(lastServiceDate), _status(status)
     {
-        InitializeComponent(airplaneId, model, capacity, baggageWeight, year);
+        InitializeComponent();
 
         vertices = new std::vector<aiVector3D>();
         faces = new std::vector<aiFace>();
@@ -23,7 +24,7 @@ namespace Airport
         delete texCoords;
     }
 
-    void AirplaneForm::InitializeComponent(String^ airplaneId, String^ model, String^ capacity, String^ baggageWeight, String^ year)
+    void AirplaneForm::InitializeComponent()
     {
         System::Drawing::Icon^ icon = gcnew System::Drawing::Icon("main_logo.ico");
         this->Icon = icon;
@@ -32,23 +33,17 @@ namespace Airport
         this->BackColor = System::Drawing::Color::White;
         this->Size = System::Drawing::Size(1500, 800);
 
-        this->openGLPanel = gcnew System::Windows::Forms::Panel();
-        this->openGLPanel->Location = System::Drawing::Point(20, 20);
-        this->openGLPanel->Size = System::Drawing::Size(800, 700);
-        this->openGLPanel->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right | AnchorStyles::Bottom);
-        this->Controls->Add(this->openGLPanel);
-        this->Load += gcnew System::EventHandler(this, &AirplaneForm::AirplaneForm_Load);
-        this->openGLPanel->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseDown);
-        this->openGLPanel->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseMove);
-        this->openGLPanel->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseUp);
-        this->FormClosed += gcnew FormClosedEventHandler(this, &AirplaneForm::AirplaneForm_FormClosed);
-
-        this->statusComboBox = gcnew System::Windows::Forms::ComboBox();
-        this->statusComboBox->Items->AddRange(gcnew cli::array<String^>{"На ремонте", "Готов к полёту", "Требуется осмотр"});
-        this->statusComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
-        this->statusComboBox->Location = System::Drawing::Point(850, 450);
-        this->statusComboBox->Size = System::Drawing::Size(300, 50);
-        //this->Controls->Add(this->statusComboBox); 
+        Label^ parametr = gcnew Label();
+        parametr->Text = "ПАРАМЕТРЫ";
+        parametr->Dock = DockStyle::Top;
+        parametr->Location = System::Drawing::Point(950, 30);
+        parametr->Size = System::Drawing::Size(500, 30);
+        parametr->Font = gcnew System::Drawing::Font("Roboto", 14, System::Drawing::FontStyle::Bold);  // Шрифт Arial, размер 16
+        parametr->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
+        parametr->BackColor = System::Drawing::Color::FromArgb(55, 71, 79);
+        parametr->ForeColor = System::Drawing::Color::White;
+        parametr->TextAlign = ContentAlignment::MiddleCenter;
+        this->Controls->Add(parametr);
 
         this->airplaneDataGridView = gcnew System::Windows::Forms::DataGridView();
         this->airplaneDataGridView->CellBorderStyle = System::Windows::Forms::DataGridViewCellBorderStyle::None;
@@ -69,20 +64,86 @@ namespace Airport
         this->airplaneDataGridView->Font = gcnew System::Drawing::Font("Arial", 14, System::Drawing::FontStyle::Regular);
         this->airplaneDataGridView->BackgroundColor = System::Drawing::Color::White;
         this->airplaneDataGridView->ForeColor = System::Drawing::Color::Black;
-        this->airplaneDataGridView->RowTemplate->Height = 40;
-        this->airplaneDataGridView->Location = System::Drawing::Point(850, 20);
-        this->airplaneDataGridView->Size = System::Drawing::Size(600, 400);
+        this->airplaneDataGridView->RowTemplate->Height = 50;
+        this->airplaneDataGridView->Location = System::Drawing::Point(950, parametr->Bottom);
+        this->airplaneDataGridView->Size = System::Drawing::Size(500, 340);
         this->airplaneDataGridView->AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode::Fill;
         this->airplaneDataGridView->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right | AnchorStyles::Bottom);
+        this->airplaneDataGridView->DefaultCellStyle->WrapMode = DataGridViewTriState::True;
         this->airplaneDataGridView->Columns->Add("Property", "Свойство");
         this->airplaneDataGridView->Columns->Add("Value", "Значение");
-
-        this->airplaneDataGridView->Rows->Add("ID", airplaneId);
-        this->airplaneDataGridView->Rows->Add("Модель", model);
-        this->airplaneDataGridView->Rows->Add("Вместимость", capacity);
-        this->airplaneDataGridView->Rows->Add("Вес багажа", baggageWeight);
-        this->airplaneDataGridView->Rows->Add("Год выпуска", year);
+        this->airplaneDataGridView->Rows->Add("ID", _airplaneId);
+        this->airplaneDataGridView->Rows->Add("Модель", _model);
+        this->airplaneDataGridView->Rows->Add("Вместимость", _capacity);
+        this->airplaneDataGridView->Rows->Add("Вес багажа", _baggageWeight);
+        this->airplaneDataGridView->Rows->Add("Год выпуска", _year);
+        this->airplaneDataGridView->Rows->Add("Дата последнего" + Environment::NewLine + "обслуживания", _lastServiceDate);
         this->Controls->Add(this->airplaneDataGridView);
+
+        this->reportButton = gcnew MaterialRaisedButton();
+        this->reportButton->Text = "ПРОВЕСТИ ОСМОТР";
+        this->reportButton->Font = gcnew System::Drawing::Font(gcnew System::Drawing::FontFamily("Arial"), 14, FontStyle::Bold);
+        this->reportButton->Size = System::Drawing::Size(500, 60);
+        this->reportButton->Location = System::Drawing::Point(950, airplaneDataGridView->Bottom + 50);
+        this->reportButton->Click += gcnew System::EventHandler(this, &AirplaneForm::ReportButton_Click);
+        this->Controls->Add(this->reportButton);
+
+        this->statusLabel = gcnew Label();
+        this->statusLabel->Text = "СТАТУС";
+        this->statusLabel->Dock = DockStyle::Top;
+        this->statusLabel->Location = System::Drawing::Point(950, reportButton->Bottom + 50);  // Установите нужные координаты
+        this->statusLabel->Size = System::Drawing::Size(500, 30);
+        this->statusLabel->Font = gcnew System::Drawing::Font("Roboto", 14, System::Drawing::FontStyle::Bold);  // Шрифт Arial, размер 16
+        this->statusLabel->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Right);
+        this->statusLabel->BackColor = System::Drawing::Color::FromArgb(55, 71, 79);
+        this->statusLabel->ForeColor = System::Drawing::Color::White;
+        this->Controls->Add(this->statusLabel);
+
+        this->statusComboBox = gcnew System::Windows::Forms::ComboBox();
+        this->statusComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+        this->statusComboBox->Location = System::Drawing::Point(950, statusLabel->Bottom);  // Установите подходящие координаты
+        this->statusComboBox->Size = System::Drawing::Size(500, 30);
+        this->statusComboBox->Items->AddRange(gcnew cli::array<String^>{"Готов к полёту", "На ремонте"});
+
+        if (_status = "Требуется осмотр")
+        {
+            this->statusComboBox->SelectedItem = "Готов к полёту";
+        }
+        else
+        {
+            this->statusComboBox->SelectedItem = _status;
+        }
+
+        this->statusComboBox->Font = gcnew System::Drawing::Font("Arial", 16);
+        this->statusLabel->TextAlign = ContentAlignment::MiddleCenter;
+        this->Controls->Add(this->statusComboBox);
+
+        this->saveButton = gcnew MaterialRaisedButton();
+        this->saveButton->Text = "Сохранить";
+        this->saveButton->Size = System::Drawing::Size(245, 60);
+        this->saveButton->Location = System::Drawing::Point(950, statusComboBox->Bottom + 50);
+        this->saveButton->Anchor = static_cast<AnchorStyles>(AnchorStyles::Bottom | AnchorStyles::Right);
+        this->saveButton->Click += gcnew System::EventHandler(this, &AirplaneForm::SaveButton_Click);
+        this->Controls->Add(this->saveButton);
+
+        this->cancelButton = gcnew MaterialRaisedButton();
+        this->cancelButton->Text = "Отмена";
+        this->cancelButton->Size = System::Drawing::Size(245, 60);
+        this->cancelButton->Location = System::Drawing::Point(saveButton->Right + 10, statusComboBox->Bottom + 50);
+        this->cancelButton->Anchor = static_cast<AnchorStyles>(AnchorStyles::Bottom | AnchorStyles::Right);
+        this->cancelButton->Click += gcnew System::EventHandler(this, &AirplaneForm::CancelButton_Click);
+        this->Controls->Add(this->cancelButton);
+
+        this->openGLPanel = gcnew System::Windows::Forms::Panel();
+        this->openGLPanel->Location = System::Drawing::Point(20, 20);
+        this->openGLPanel->Size = System::Drawing::Size(1000, 800);
+        this->openGLPanel->Anchor = static_cast<AnchorStyles>(AnchorStyles::Top | AnchorStyles::Left | AnchorStyles::Right | AnchorStyles::Bottom);
+        this->Controls->Add(this->openGLPanel);
+        this->Load += gcnew System::EventHandler(this, &AirplaneForm::AirplaneForm_Load);
+        this->openGLPanel->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseDown);
+        this->openGLPanel->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseMove);
+        this->openGLPanel->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &AirplaneForm::OnMouseUp);
+        this->FormClosed += gcnew FormClosedEventHandler(this, &AirplaneForm::AirplaneForm_FormClosed);
     }
 
     void AirplaneForm::SetupOpenGL()
@@ -334,6 +395,72 @@ namespace Airport
     {
         Application::Idle -= gcnew EventHandler(this, &AirplaneForm::OnApplicationIdle);
         CleanupOpenGL();
+    }
+
+    void AirplaneForm::StatusComboBox_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e)
+    {
+        
+    }
+
+    void AirplaneForm::ReportButton_Click(Object^ sender, EventArgs^ e)
+    {
+        Form^ reportForm = gcnew AirplaneReportForm(_airplaneId, _model, _capacity, _baggageWeight, _year);
+
+        reportForm->Show();
+    }
+
+    void AirplaneForm::SaveButton_Click(Object^ sender, EventArgs^ e)
+    {
+        String^ selectedStatus = this->statusComboBox->SelectedItem->ToString();
+        SqlConnection^ connection = gcnew SqlConnection("Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;");
+
+        try
+        {
+            connection->Open();
+
+            SqlCommand^ command = gcnew SqlCommand("UpdateAirplaneStatus", connection);
+            command->CommandType = CommandType::StoredProcedure;
+
+            command->Parameters->Add(gcnew SqlParameter("@airplaneId", SqlDbType::Int))->Value = _airplaneId;
+            command->Parameters->Add(gcnew SqlParameter("@newStatus", SqlDbType::NVarChar))->Value = selectedStatus;
+
+            command->ExecuteNonQuery();
+
+            MessageBox::Show("Статус самолета обновлен!", "Сохранено", MessageBoxButtons::OK, MessageBoxIcon::Information);
+
+            for each (Form ^ frm in Application::OpenForms)
+            {
+                if (frm->Name == "MenuTechForm")
+                {
+                    MenuTechForm^ menuForm = dynamic_cast<MenuTechForm^>(frm);
+                    if (menuForm != nullptr)
+                    {
+                        for each (Control ^ control in menuForm->airplaneTab->Controls)
+                        {
+                            AirplanesForm^ boardingPassForm = dynamic_cast<AirplanesForm^>(control);
+                            if (boardingPassForm != nullptr)
+                            {
+                                boardingPassForm->LoadAirplanes();
+                            }
+                        }
+                    }
+                }
+            }
+            this->Close();
+        }
+        catch (Exception^ ex)
+        {
+            MessageBox::Show("Ошибка при сохранении статуса: " + ex->Message, "Ошибка", MessageBoxButtons::OK, MessageBoxIcon::Error);
+        }
+        finally
+        {
+            connection->Close();
+        }
+    }
+
+    void AirplaneForm::CancelButton_Click(Object^ sender, EventArgs^ e)
+    {
+        this->Close();
     }
 
     GLuint AirplaneForm::LoadTexture(const std::string& filePath)

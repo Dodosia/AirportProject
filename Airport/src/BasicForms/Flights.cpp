@@ -77,7 +77,14 @@ namespace Airport
         this->btnSearch = gcnew MaterialFlatButton();
         this->btnSearch->Text = "Найти";
         this->btnSearch->Location = System::Drawing::Point(700, 15);
+        this->btnSearch->Click += gcnew System::EventHandler(this, &FlightsForm::btnSearch_Click);
         this->Controls->Add(this->btnSearch);
+
+        this->btnClear = gcnew MaterialFlatButton();
+        this->btnClear->Text = "Очистить";
+        this->btnClear->Location = System::Drawing::Point(btnSearch->Right + 20, 15);
+        this->btnClear->Click += gcnew System::EventHandler(this, &FlightsForm::btnClear_Click);
+        this->Controls->Add(this->btnClear);
 	}
 
 
@@ -118,4 +125,78 @@ namespace Airport
             sqlConnection->Close();
         }
 	}
+
+    void FlightsForm::btnSearch_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        String^ number = this->txtNumber->Text;
+        String^ airport = this->txtAirport->Text;
+
+        dataGridViewFlights->Rows->Clear();
+
+        if (String::IsNullOrEmpty(number) && String::IsNullOrEmpty(airport)) {
+            LoadFlights();
+            return;
+        }
+
+        String^ query = "SELECT * FROM Рейс WHERE 1=1";
+
+        if (!String::IsNullOrEmpty(number))
+        {
+            query += " AND Номер LIKE @Number";
+        }
+        if (!String::IsNullOrEmpty(airport))
+        {
+            query += " AND АэропортПрилета LIKE @Airport";
+        }
+
+        SqlConnection^ sqlConnection = gcnew SqlConnection("Data Source=LAPTOP-FV01NO90;Initial Catalog=Aeroport;Integrated Security=True;");
+        SqlCommand^ command = gcnew SqlCommand(query, sqlConnection);
+
+        if (!String::IsNullOrEmpty(number))
+        {
+            command->Parameters->AddWithValue("@Number", "%" + number + "%");
+        }
+        if (!String::IsNullOrEmpty(airport))
+        {
+            command->Parameters->AddWithValue("@Airport", "%" + airport + "%");
+        }
+
+        sqlConnection->Open();
+        SqlDataReader^ reader = command->ExecuteReader();
+
+        bool found = false;
+
+        while (reader->Read())
+        {
+            dataGridViewFlights->Rows->Add(
+                reader["Номер"]->ToString(),
+                reader["IdСамолета"]->ToString(),
+                reader["АэропортВылета"]->ToString(),
+                reader["АэропортПрилета"]->ToString(),
+                reader["ВремяОтправления"]->ToString(),
+                reader["ВремяПрибытия"]->ToString(),
+                reader["ВремяВпути"]->ToString()
+            );
+            found = true;
+        }
+
+        reader->Close();
+        sqlConnection->Close();
+
+        if (!found)
+        {
+            LoadFlights();
+            MessageBox::Show("Рейс или аэропорт, соответствующие заданным параметрам, не найдены.", "Поиск не дал результатов", MessageBoxButtons::OK, MessageBoxIcon::Information);
+        }
+    }
+
+    void FlightsForm::btnClear_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        this->txtNumber->Text = "";
+        this->txtAirport->Text = "";
+
+        dataGridViewFlights->Rows->Clear();
+
+        LoadFlights();
+    }
 }

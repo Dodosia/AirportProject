@@ -23,16 +23,19 @@ namespace Airport
 		this->Text = "Главное меню: Агент регистрации";
 		this->Size = System::Drawing::Size(1500, 1000);
 		this->StartPosition = FormStartPosition::CenterScreen;
+		this->Name = "MenuAgentForm";
 
 		tabControl = gcnew MaterialTabControl();
 		tabControl->Dock = DockStyle::Fill;
 		tabControl->BackColor = System::Drawing::Color::White;
 		tabControl->ForeColor = System::Drawing::Color::Black;
 
+		tabControl->SelectedIndexChanged += gcnew EventHandler(this, &MenuAgentForm::tabControl_SelectedIndexChanged);
+
 		tabSelector = gcnew MaterialTabSelector();
 		tabSelector->Dock = DockStyle::Top;
 		tabSelector->BaseTabControl = tabControl;
-		tabSelector->BackColor = System::Drawing::Color::White;  // Set background color of the tab selector
+		tabSelector->BackColor = System::Drawing::Color::White;
 		tabSelector->ForeColor = System::Drawing::Color::Black;
 		
 		flightsTab = gcnew TabPage("Рейсы");
@@ -99,5 +102,20 @@ namespace Airport
 		lblDispatcher->ForeColor = System::Drawing::Color::White;
 		this->Controls->Add(lblDispatcher);
 		lblDispatcher->BringToFront();
+	}
+
+	void MenuAgentForm::tabControl_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e)
+	{
+		if (tabControl->SelectedTab == boardingPassTab)
+		{
+			for each (Control ^ control in boardingPassTab->Controls)
+			{
+				BoardingPassForm^ passangersForm = dynamic_cast<BoardingPassForm^>(control);
+				if (passangersForm != nullptr)
+				{
+					passangersForm->LoadBoardingPass();
+				}
+			}
+		}
 	}
 }
