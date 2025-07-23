@@ -3,4 +3,4 @@
 аэропорта, которая обеспечит эффективное хранение и управление 
 информацией, автоматизирует ключевые процессы и повысит общую 
 эффективность работы.
-### [Описание] (https://github.com/Dodosia/AirportProject/blob/main/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82_%D0%A3%D0%94_.pdf)
+### [Описание](https://github.com/Dodosia/AirportProject/blob/main/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82_%D0%A3%D0%94_.pdf)
