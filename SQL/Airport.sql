@@ -1,0 +1,4 @@
+CREATE TABLE Аэропорт(
+Код VARCHAR(3) PRIMARY KEY, 
+Страна VARCHAR(15) NOT NULL, 
+Город VARCHAR(15) NOT NULL) 
